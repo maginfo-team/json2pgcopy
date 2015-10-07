@@ -1,0 +1,4 @@
+*.o
+*.swp
+json2copy
+json2copy_tests
