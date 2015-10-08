@@ -21,3 +21,5 @@ size_t write_null(FILE *fp);
 
 FieldValue convert_string(char *source, int len);
 FieldValue convert_integer(char *source, int len);
+FieldValue convert_smallint(char *source, int len);
+FieldValue convert_bigint(char *source, int len);

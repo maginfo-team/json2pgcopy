@@ -1,21 +1,6 @@
 #include "minunit.h"
 #include "json2copy.h"
 
-/*char *test_jsmn() {
-    jsmntok_t tokens[8];
-    jsmnerr_t r;
-    char str[] = "{\"field\": \"Test string\"}";
-    int i;
-    jsmn_parser parser;
-    jsmn_init(&parser);
-    r = jsmn_parse(&parser, str, strlen(str), tokens, 8);
-    for (i = 0; i < r; i++ ) {
-        debug("type=%d, start=%d, end=%d, size=%d", tokens[i].type, tokens[i].start, tokens[i].end, tokens[i].size);
-    }
-    return NULL;
-}
-*/
-
 char *test_convert_string()
 {
     int i;
@@ -46,11 +31,28 @@ char *test_convert_integer_negative()
 
 char *test_convert_integer_incorrect()
 {
-    int i;
     char str[] = "abc";
     FieldValue val = convert_integer(str, strlen(str));
     mu_assert(val.bytes == 0, "Value size should be set to 0 on error");
     mu_assert(val.data == NULL, "Value data should be NULL on error");
+}
+
+char *test_convert_smallint()
+{
+    char str[] = "255";
+    char expect[] = { 0x00, 0xff };
+    FieldValue val = convert_smallint(str, strlen(str));
+    mu_assert(val.bytes == 2, "Value length should be equal to 2");
+    mu_assert(memcmp(val.data, expect, 2) == 0, "Value data s incorrect");
+}
+
+char *test_convert_bigint()
+{
+    char str[] = "2147483648";
+    char expect[] = { 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00 };
+    FieldValue val = convert_bigint(str, strlen(str));
+    mu_assert(val.bytes == 8, "Value length should be equal to 2");
+    mu_assert(memcmp(val.data, expect, 8) == 0, "Value data s incorrect");
 }
 
 char *all_tests() {
@@ -61,6 +63,8 @@ char *all_tests() {
     mu_run_test(test_convert_integer_positive);
     mu_run_test(test_convert_integer_negative);
     mu_run_test(test_convert_integer_incorrect);
+    mu_run_test(test_convert_smallint);
+    mu_run_test(test_convert_bigint);
 
     return NULL;
 }

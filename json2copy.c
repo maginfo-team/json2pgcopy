@@ -4,26 +4,25 @@
 #include "../jsmn/jsmn.h"
 
 FieldValue convert_string(char *source, int len) {
-
     char *data = strndup(source, len);
     FieldValue ret = { .data = data, .bytes = len };
     return ret;
 }
 
-FieldValue convert_integer(char *source, int len) {
+FieldValue convert_int(char *source, int len, int int_size) {
+    int i;
     FieldValue ret;
     char *raw_val = strndup(source, len);
     char *errptr;
     int64_t val = strtol(raw_val, &errptr, 10);
     check(*errptr == '\0', "Failed to convert field to long");
     char *data;
-    data = malloc(4);
-    data[0] = (val >> 24) & 0xff;
-    data[1] = (val >> 16) & 0xff;
-    data[2] = (val >> 8) & 0xff;
-    data[3] = val & 0xff;
+    data = malloc(int_size);
+    for ( i = 0; i < int_size; i++ ) {
+        data[i] = (val >> (int_size*8 - 8*(i+1))) & 0xff;
+    }
     ret.data = data;
-    ret.bytes = 4;
+    ret.bytes = int_size;
     free(raw_val);
     return ret;
 
@@ -31,6 +30,18 @@ error:
     ret.data = NULL;
     ret.bytes = 0;
     return ret;
+}
+
+FieldValue convert_smallint(char *source, int len) {
+    return convert_int(source, len, 2);
+}
+
+FieldValue convert_integer(char *source, int len) {
+    return convert_int(source, len, 4);
+}
+
+FieldValue convert_bigint(char *source, int len) {
+    return convert_int(source, len, 8);
 }
 
 char *read_line(FILE *fp, size_t init_bufsize) {
