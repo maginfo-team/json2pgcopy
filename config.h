@@ -3,5 +3,6 @@
 
 FieldConfig fields[] = {
     { "author", &convert_string},
+    { "score", &convert_integer}
 };
 

@@ -1,8 +1,26 @@
 #include "json2copy.h"
 #include "dbg.h"
 
-FieldValue convert_string(char *source, int bytes) {
-    FieldValue ret = { .data = source, .bytes = bytes };
+#include "../jsmn/jsmn.h"
+
+FieldValue convert_string(char *source, int len) {
+
+    char *data = strndup(source, len);
+    FieldValue ret = { .data = data, .bytes = len };
+    return ret;
+}
+
+FieldValue convert_integer(char *source, int len) {
+    char *raw_val = strndup(source, len);
+    int32_t val = atoi(raw_val);
+    char *data;
+    data = malloc(4);
+    data[0] = (val >> 24) & 0xff;
+    data[1] = (val >> 16) & 0xff;
+    data[2] = (val >> 8) & 0xff;
+    data[3] = val & 0xff;
+    FieldValue ret = { .data = data, .bytes = 4 };
+    free(raw_val);
     return ret;
 }
 

@@ -1,6 +1,6 @@
 #include "json2copy.h"
-#include "../jsmn/jsmn.h"
 #include "dbg.h"
+#include "../jsmn/jsmn.h"
 
 const char PGCOPY_HEADER[19] = { 'P', 'G', 'C', 'O', 'P', 'Y', '\n', 0xff, '\r', '\n', '\0' };
 const char PGCOPY_TRAILER[] = { 0xff, 0xff };
@@ -9,17 +9,25 @@ jsmn_parser parser;
 
 size_t process_field(char *json, jsmntok_t *tokens, jsmnerr_t tokens_num, FieldConfig field_config) {
     int j;
+    size_t r = 0;
     for ( j = 0; j < tokens_num; j++ ) {
         if (tokens[j].type == JSMN_STRING && 
                 (int) strlen(field_config.source_field) == tokens[j].end - tokens[j].start && 
                 strncmp(json + tokens[j].start, field_config.source_field, tokens[j].end - tokens[j].start) == 0) {
             if ( tokens[j+1].type == JSMN_PRIMITIVE &&
                 *(json + tokens[j+1].start) == 'n') {
-                return write_null(stdout);
+                r = write_null(stdout);
+            } else {
+                FieldValue val = field_config.func(json+tokens[j+1].start,
+                        tokens[j+1].end - tokens[j+1].start);
+                r = write_val(stdout, val);
+                free(val.data);
             }
-            return write_val(stdout, field_config.func(json + tokens[j+1].start, tokens[j+1].end - tokens[j+1].start));
+            return r;
         }
     }
+    log_warn("Didn't find field %s in json %s", field_config.source_field, json);
+    return r;
 }
 
 #include "config.h"
