@@ -11,16 +11,25 @@ FieldValue convert_string(char *source, int len) {
 }
 
 FieldValue convert_integer(char *source, int len) {
+    FieldValue ret;
     char *raw_val = strndup(source, len);
-    int32_t val = atoi(raw_val);
+    char *errptr;
+    int64_t val = strtol(raw_val, &errptr, 10);
+    check(*errptr == '\0', "Failed to convert field to long");
     char *data;
     data = malloc(4);
     data[0] = (val >> 24) & 0xff;
     data[1] = (val >> 16) & 0xff;
     data[2] = (val >> 8) & 0xff;
     data[3] = val & 0xff;
-    FieldValue ret = { .data = data, .bytes = 4 };
+    ret.data = data;
+    ret.bytes = 4;
     free(raw_val);
+    return ret;
+
+error:
+    ret.data = NULL;
+    ret.bytes = 0;
     return ret;
 }
 

@@ -44,15 +44,13 @@ char *test_convert_integer_negative()
     mu_assert(memcmp(val.data, expect, 4) == 0, "Incorrect value for data");
 }
 
-char *test_convert_integer_overflow()
+char *test_convert_integer_incorrect()
 {
     int i;
-    char str[] = "2147483647";
-    char expect[] = { 0xff, 0xff, 0xff, 0x01 };
+    char str[] = "abc";
     FieldValue val = convert_integer(str, strlen(str));
-    mu_assert(val.bytes == 4, "Incorrect value for length");
-    for ( i = 0; i < 4; i++ ) debug("%d %x",i,  (unsigned char)val.data[i]);
-    mu_assert(memcmp(val.data, expect, 4) == 0, "Incorrect value for data");
+    mu_assert(val.bytes == 0, "Value size should be set to 0 on error");
+    mu_assert(val.data == NULL, "Value data should be NULL on error");
 }
 
 char *all_tests() {
@@ -62,7 +60,7 @@ char *all_tests() {
     mu_run_test(test_convert_string);
     mu_run_test(test_convert_integer_positive);
     mu_run_test(test_convert_integer_negative);
-    //mu_run_test(test_convert_integer_overflow);
+    mu_run_test(test_convert_integer_incorrect);
 
     return NULL;
 }

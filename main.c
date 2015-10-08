@@ -20,6 +20,7 @@ size_t process_field(char *json, jsmntok_t *tokens, jsmnerr_t tokens_num, FieldC
             } else {
                 FieldValue val = field_config.func(json+tokens[j+1].start,
                         tokens[j+1].end - tokens[j+1].start);
+                check(val.bytes > 0, "Error processing field %s in %s", field_config.source_field, json);
                 r = write_val(stdout, val);
                 free(val.data);
             }
@@ -28,6 +29,9 @@ size_t process_field(char *json, jsmntok_t *tokens, jsmnerr_t tokens_num, FieldC
     }
     log_warn("Didn't find field %s in json %s", field_config.source_field, json);
     return r;
+
+error:
+    return 0;
 }
 
 #include "config.h"
