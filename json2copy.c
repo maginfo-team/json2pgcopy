@@ -44,6 +44,24 @@ FieldValue convert_bigint(char *source, int len) {
     return convert_int(source, len, 8);
 }
 
+FieldValue convert_bool(char *source, int len) {
+    FieldValue ret;
+    char *data = malloc(1);
+    if ( source[0] == 't' ) {
+        data[0] = '\x1';
+    } else if ( source[0] == 'f' ) {
+        data[0] = '\0';
+    } else {
+        ret.data = NULL;
+        ret.bytes = 0;
+        return ret;
+    }
+    ret.data = data;
+    ret.bytes = 1;
+    return ret;
+
+}
+
 char *read_line(FILE *fp, size_t init_bufsize) {
     char *line;
     char ch;

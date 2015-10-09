@@ -12,6 +12,7 @@ size_t process_field(char *json, jsmntok_t *tokens, jsmnerr_t tokens_num, FieldC
     size_t r = 0;
     for ( j = 0; j < tokens_num; j++ ) {
         if (tokens[j].type == JSMN_STRING && 
+                tokens[j].size> 0 && //This ensures that we found a key
                 (int) strlen(field_config.source_field) == tokens[j].end - tokens[j].start && 
                 strncmp(json + tokens[j].start, field_config.source_field, tokens[j].end - tokens[j].start) == 0) {
             if ( tokens[j+1].type == JSMN_PRIMITIVE &&
@@ -66,7 +67,8 @@ int main(int argc, char *argv[]) {
                 /*if ( fields[i].raw_data != NULL ) {
                     write_val(stdout, fields[i].raw_data);
                 }*/
-                check(process_field(line, tokens, r, fields[i]), "Failed to process field %s in %s", fields[i].source_field, line);
+                check(process_field(line, tokens, r, fields[i]), 
+                        "Failed to process field %s in %s", fields[i].source_field, line);
             }
 
         }

@@ -23,3 +23,4 @@ FieldValue convert_string(char *source, int len);
 FieldValue convert_integer(char *source, int len);
 FieldValue convert_smallint(char *source, int len);
 FieldValue convert_bigint(char *source, int len);
+FieldValue convert_bool(char *source, int len);
