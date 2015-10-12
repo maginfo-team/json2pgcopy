@@ -1,10 +1,10 @@
 CFLAGS=-g
-json2copy: json2copy.o main.o ../jsmn/libjsmn.a
+json2pgcopy: json2pgcopy.o main.o ../jsmn/libjsmn.a
 
 clean:
-	rm -rf json2copy json2copy_tests *.o
+	rm -rf json2pgcopy json2pgcopy_tests *.o
 
-json2copy_tests: json2copy.o
+json2copy_tests: json2pgcopy.o
 
-tests: json2copy_tests
-	./json2copy_tests
+tests: json2pgcopy_tests
+	./json2pgcopy_tests

@@ -1,4 +1,4 @@
-#include "json2copy.h"
+#include "json2pgcopy.h"
 #include "dbg.h"
 #include "../jsmn/jsmn.h"
 
@@ -77,11 +77,11 @@ int main(int argc, char *argv[]) {
                     break;
                 } 
             }
+            fclose(out_buf_fp);
             if ( ! err ) {
-                fclose(out_buf_fp);
                 fwrite(out_buf, out_buf_size, 1, stdout);
-                free(out_buf);
             }
+            free(out_buf);
 
         }
         free(line);

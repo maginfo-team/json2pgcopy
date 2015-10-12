@@ -1,4 +1,4 @@
-#include "json2copy.h"
+#include "json2pgcopy.h"
 #include "dbg.h"
 
 #include "../jsmn/jsmn.h"
