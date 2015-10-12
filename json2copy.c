@@ -27,6 +27,7 @@ FieldValue convert_int(char *source, int len, int int_size) {
     return ret;
 
 error:
+    free(raw_val);
     ret.data = NULL;
     ret.bytes = 0;
     return ret;
@@ -52,6 +53,7 @@ FieldValue convert_bool(char *source, int len) {
     } else if ( source[0] == 'f' ) {
         data[0] = '\0';
     } else {
+        free(data);
         ret.data = NULL;
         ret.bytes = 0;
         return ret;
@@ -72,6 +74,7 @@ char *read_line(FILE *fp, size_t init_bufsize) {
     while ( 1 ) {
         ch = fgetc(fp);
         if ( ch == EOF && len == 0 ) {
+            free(line);
             return NULL;
         }
         if ( ch == EOF || ch == '\n') {
@@ -93,8 +96,8 @@ size_t write_val(FILE *fp, FieldValue val) {
     len[1] = (val.bytes >> 16) & 0xff;
     len[2] = (val.bytes >> 8) & 0xff;
     len[3] = val.bytes & 0xff;
-    check(count += fwrite(&len, 4, 1, stdout), "Failed to write value size to stdout");
-    check(count += fwrite(val.data, val.bytes, 1, stdout), "Failed to write value to stdout");
+    check(count += fwrite(&len, 4, 1, fp), "Failed to write value size to stdout");
+    check(count += fwrite(val.data, val.bytes, 1, fp), "Failed to write value to stdout");
     return count;
 
 error:
